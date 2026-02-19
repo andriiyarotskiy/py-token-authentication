@@ -14,4 +14,3 @@ class IsAdminOrIfAuthenticatedReadOnly(BasePermission):
         if request.user and request.user.is_staff:
             return True
         return False
-
