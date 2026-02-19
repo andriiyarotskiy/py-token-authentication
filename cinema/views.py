@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.db.models import F, Count
 from rest_framework import mixins, viewsets, generics
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 
@@ -27,6 +28,7 @@ class CinemaBasicViewSet(
     viewsets.GenericViewSet
 ):
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly]
+    authentication_classes = (TokenAuthentication,)
 
 
 class GenreViewSet(CinemaBasicViewSet):
@@ -90,11 +92,12 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         .select_related("movie", "cinema_hall")
         .annotate(
             tickets_available=F("cinema_hall__rows")
-            * F("cinema_hall__seats_in_row")
-            - Count("tickets")
+                              * F("cinema_hall__seats_in_row")
+                              - Count("tickets")
         )
     )
     serializer_class = MovieSessionSerializer
+    authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly]
 
     def get_queryset(self):
